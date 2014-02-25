@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset=utf-8>
+	<title></title>
+	<style>
+		body {
+			background: black;
+			color: white;
+		}
+	</style>
+</head>
+<body>
+<input id="fileupload" type="file" name="file" data-url="file.php" multiple>
+<button id="upload_all">上传全部</button>
+<form id="form1" runat="server">
+</form>
+
+<div id="progress">
+    <div class="bar" style="width: 0%;height: 20px;background:white;"></div>
+</div>
+<script src="js/jquery-1.10.2.min.js"></script>
+<script src="js/jquery.ui.widget.js"></script>
+<script src="js/jquery.iframe-transport.js"></script>
+<script src="js/jquery.fileupload.js"></script>
+	<script>
+		$(function(){
+			$('#fileupload').fileupload({
+		        dataType: 'html',
+		        acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
+		        done: function (e, data) {
+		            // $.each(data.result.files, function (index, file) {
+		                $('<pre/>').text(data.result).appendTo(document.body);
+		                // console.log(data.result);
+		                $.each(data.files, function(k,v){
+		                	// console.log(v.name);
+		                	$('<img/>').attr('src', 'upload/' + v.name).appendTo(document.body);
+		                });
+		            // });
+					console.log(this);
+		        },
+		        progressall: function (e, data) {
+			        var progress = parseInt(data.loaded / data.total * 100, 10);
+			        $('#progress .bar').css(
+			            'width',
+			            progress + '%'
+			        );
+			    },
+			    add: function (e, data) {
+		            // data.context = $('<p/>').text('Uploading...').appendTo(document.body);
+		            // data.submit();
+
+		            data.context = $('<button class="upload">upload</button>')
+						                .appendTo(document.body)
+						                .click(function () {
+						                    data.context = $('<p/>').text('Uploading...').replaceAll($(this));
+						                    data.submit();
+						                });
+					// data.context[0].click();
+					console.log(data.context);
+		        },
+		        submit: function(){
+		        	console.log(1);
+		        }
+		    });
+
+
+			function readURL(input) {
+			    if (input.files && input.files[0]) {
+			        var reader = new FileReader();
+			        reader.onload = function (e) {
+			        	$('#form1').append($('<img src="' + e.target.result + '" style="width: 200px;" />'));
+			        }
+			        reader.readAsDataURL(input.files[0]);
+			    }
+			}
+
+			$("#fileupload").change(function(){
+				// console.log(1);
+			    readURL(this);
+			});
+
+			$('#upload_all').on('click', function(){
+				$.each( $('body .upload'), function(k,v){
+					v.click();
+				} );
+			});
+		});
+	</script>
+</body>
+</html>
